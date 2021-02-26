@@ -1,8 +1,11 @@
 package com.dummy.myerp.business.impl.manager;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.dummy.myerp.testbusiness.business.SpringRegistry;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
 import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
@@ -15,6 +18,10 @@ public class ComptabiliteManagerImplTest {
 
     private ComptabiliteManagerImpl manager = new ComptabiliteManagerImpl();
 
+    @BeforeClass
+    public static void initContext() {
+        SpringRegistry.init();
+    }
 
     @Test
     public void checkEcritureComptableUnit() throws Exception {
@@ -74,6 +81,19 @@ public class ComptabiliteManagerImplTest {
 
     @Test
     public void checkReference() throws Exception{
-        System.out.println(manager.getListCompteComptable());
+        System.out.println(manager.getListEcritureComptable());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+        String date = sdf.format(new Date());
+        JournalComptable journal = new JournalComptable();
+        journal.setCode("BQ");
+        String code = "BQ";
+        int ref =23;
+        System.out.println(date);
+        System.out.println(manager.getLastSequenceofJournal(journal,2016));
+        System.out.println(String.format("%05d",ref));
+        String reference =code+"-"+date+"/"+String.format("%05d",ref);
+        System.out.println(reference);
+        System.out.println(manager.getListEcritureComptable().size());
+        System.out.println( String.format("%.2s-%4d/%05d", "BQ" ,22053, 23));
     }
 }

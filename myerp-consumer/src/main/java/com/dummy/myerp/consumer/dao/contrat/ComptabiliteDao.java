@@ -5,6 +5,7 @@ import java.util.List;
 import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
 import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
+import com.dummy.myerp.model.bean.comptabilite.SequenceEcritureComptable;
 import com.dummy.myerp.technical.exception.NotFoundException;
 
 
@@ -80,4 +81,9 @@ public interface ComptabiliteDao {
      * @param pId l'id de l'écriture
      */
     void deleteEcritureComptable(Integer pId);
+
+    SequenceEcritureComptable loadLastSequenceValueOfJournal(JournalComptable journal,Integer year) throws NotFoundException;
+
+     void updateSequenceEcritureComptable(SequenceEcritureComptable sequence);
+    void insertSequenceEcritureComptable(SequenceEcritureComptable sequence, JournalComptable journal);
 }
