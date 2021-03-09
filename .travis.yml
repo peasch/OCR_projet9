@@ -1,4 +1,9 @@
 language : java
+jdk:
+  - openjdk8
+
+sudo: false
+
 services:
   - docker
 before_script:
