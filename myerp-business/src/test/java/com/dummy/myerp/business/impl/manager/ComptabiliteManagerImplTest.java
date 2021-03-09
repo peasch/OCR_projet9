@@ -108,9 +108,10 @@ public class ComptabiliteManagerImplTest {
         journal.setCode("BQ");
         journal.setLibelle("Banque");
         ecritureComptable.setJournal(journal);
+        SequenceEcritureComptable sequenceEcritureComptable = manager.getLastSequenceofJournal(journal,2021);
         manager.addReference(ecritureComptable);
         System.out.println(ecritureComptable.getReference());
-        Assert.assertEquals(ecritureComptable.getReference(),"BQ-2021/00028");
+        Assert.assertEquals(ecritureComptable.getReference(),String.format("%.2s-%4d/%05d", "BQ" ,2021, sequenceEcritureComptable.getDerniereValeur()+1));
 
 
 
