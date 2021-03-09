@@ -110,7 +110,7 @@ public class ComptabiliteManagerImplTest {
         ecritureComptable.setJournal(journal);
         manager.addReference(ecritureComptable);
         System.out.println(ecritureComptable.getReference());
-        Assert.assertEquals(ecritureComptable.getReference(),"BQ-2021/00027");
+        Assert.assertEquals(ecritureComptable.getReference(),"BQ-2021/00028");
 
 
 
