@@ -158,24 +158,27 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
 
         // ===== RG_Compta_5 : Format et contenu de la référence
         // vérifier que l'année dans la référence correspond bien à la date de l'écriture, idem pour le code journal...
-        /*String reference = pEcritureComptable.getReference();
-        String journalOfRef = reference.substring(0, 2);
-        int dateOfRef = Integer.parseInt(reference.substring(3, 7));
+        if (pEcritureComptable.getReference() != null) {
+            String reference = pEcritureComptable.getReference();
 
-        if (!journalOfRef.equals(pEcritureComptable.getJournal().getCode())) {
-            throw new FunctionalException("Le code de la référence ne correspond pas au code Journal.",
-            new ConstraintViolationException(
-                    "L'écriture comptable ne respecte pas les contraintes de validation",
-                    vViolations));
+            String journalOfRef = reference.substring(0, 2);
+            int dateOfRef = Integer.parseInt(reference.substring(3, 7));
+
+            if (!journalOfRef.equals(pEcritureComptable.getJournal().getCode())) {
+                throw new FunctionalException("Le code de la référence ne correspond pas au code Journal.",
+                        new ConstraintViolationException(
+                                "L'écriture comptable ne respecte pas les contraintes de validation",
+                                vViolations));
+            }
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(pEcritureComptable.getDate());
+            if (dateOfRef != calendar.get(Calendar.YEAR)) {
+                throw new FunctionalException("L'année de la référence ne correspond pas à l'année d'écriture.",
+                        new ConstraintViolationException(
+                                "L'écriture comptable ne respecte pas les contraintes de validation",
+                                vViolations));
+            }
         }
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(pEcritureComptable.getDate());
-        if (dateOfRef != calendar.get(Calendar.YEAR)) {
-            throw new FunctionalException("L'année de la référence ne correspond pas à l'année d'écriture.",
-                    new ConstraintViolationException(
-                            "L'écriture comptable ne respecte pas les contraintes de validation",
-                            vViolations));
-        }*/
     }
 
 
