@@ -2,15 +2,16 @@ package com.dummy.myerp.business.impl.manager;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
+import com.dummy.myerp.model.bean.comptabilite.*;
+import com.dummy.myerp.technical.exception.NotFoundException;
 import com.dummy.myerp.testbusiness.business.SpringRegistry;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
-import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
-import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
-import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
 import com.dummy.myerp.technical.exception.FunctionalException;
 
 
@@ -91,9 +92,36 @@ public class ComptabiliteManagerImplTest {
         System.out.println(date);
         System.out.println(manager.getLastSequenceofJournal(journal,2016));
         System.out.println(String.format("%05d",ref));
-        String reference =code+"-"+date+"/"+String.format("%05d",ref);
+        String reference =(code+"-"+date+"/"+String.format("%05d",ref)).trim();
         System.out.println(reference);
         System.out.println(manager.getListEcritureComptable().size());
         System.out.println( String.format("%.2s-%4d/%05d", "BQ" ,22053, 23));
+    }
+
+    @Test
+    public void checkAddReference() throws NotFoundException, FunctionalException {
+        EcritureComptable ecritureComptable = new EcritureComptable();
+        JournalComptable journal = new JournalComptable();
+        SequenceEcritureComptable sequence =new SequenceEcritureComptable();
+        /*sequence.setDerniereValeur(9);
+        sequence.setAnnee(2016);*/
+        journal.setCode("BQ");
+        journal.setLibelle("Banque");
+        ecritureComptable.setJournal(journal);
+        manager.addReference(ecritureComptable);
+        System.out.println(ecritureComptable.getReference());
+        Assert.assertEquals(ecritureComptable.getReference(),"BQ-2021/00027");
+
+
+
+        sequence.setDerniereValeur(2);
+        sequence.setAnnee(2016);
+        journal.setCode("AA");
+        journal.setLibelle("Achats anticipés");
+        ecritureComptable.setJournal(journal);
+        manager.addReference(ecritureComptable);
+        System.out.println(ecritureComptable.getReference());
+        Assert.assertEquals(ecritureComptable.getReference(),"");
+
     }
 }
