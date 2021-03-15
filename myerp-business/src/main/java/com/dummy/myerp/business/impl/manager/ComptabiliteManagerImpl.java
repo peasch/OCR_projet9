@@ -12,6 +12,7 @@ import org.springframework.transaction.TransactionStatus;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -21,7 +22,7 @@ import java.util.*;
 public class ComptabiliteManagerImpl extends AbstractBusinessManager implements ComptabiliteManager {
 
     // ==================== Attributs ====================
-
+    private static String noConstraintValidation = "L'écriture comptable ne respecte pas les contraintes de validation";
 
     // ==================== Constructeurs ====================
 
@@ -29,6 +30,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
      * Instantiates a new Comptabilite manager.
      */
     public ComptabiliteManagerImpl() {
+        // empty constructor
     }
 
 
@@ -60,43 +62,52 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     /**
      * {@inheritDoc}
      */
-    // TODO à tester
+    //  à tester
     @Override
     public synchronized void addReference(EcritureComptable pEcritureComptable) throws NotFoundException, FunctionalException {
         Boolean journalExist = false;
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        JournalComptable journal = pEcritureComptable.getJournal();
-        List<JournalComptable> journalList = this.getListJournalComptable();
-        SequenceEcritureComptable sequenceEcritureComptable = new SequenceEcritureComptable();
-        for (JournalComptable journalC : journalList) {
-            if (journal.getCode().equals(journalC.getCode())) {
-                journalExist = true;
-            }
-        }
-        if (journalExist) {
-            try {
-                sequenceEcritureComptable = getDaoProxy().getComptabiliteDao().
-                        loadLastSequenceValueOfJournal(journal, currentYear);
-                sequenceEcritureComptable.setDerniereValeur(
-                        sequenceEcritureComptable.getDerniereValeur() + 1);
-            } catch (NotFoundException e) {
-
-                sequenceEcritureComptable.setAnnee(currentYear);
-                sequenceEcritureComptable.setDerniereValeur(1);
-                getDaoProxy().getComptabiliteDao()
-                        .insertSequenceEcritureComptable(sequenceEcritureComptable, journal);
-            }
-
-            String reference = String.format("%.2s-%4d/%05d", journal.getCode(),
-                    currentYear, sequenceEcritureComptable.getDerniereValeur()).trim();
-            pEcritureComptable.setReference(reference);
-            pEcritureComptable.setDate(new Date());
-            this.checkEcritureComptableContext(pEcritureComptable);
-            getDaoProxy().getComptabiliteDao()
-                    .updateSequenceEcritureComptable(sequenceEcritureComptable, journal);
+        int currentYear;
+        if (pEcritureComptable.getDate() != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+            currentYear = Integer.parseInt(sdf.format(pEcritureComptable.getDate()));
         } else {
-            System.out.println("le journal n'existe pas, il faut le créer");
-            pEcritureComptable.setReference("");
+            currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            pEcritureComptable.setDate(new Date());
+        }
+        JournalComptable journal = pEcritureComptable.getJournal();
+        List<JournalComptable> journalList;
+        if (journal != null) {
+            journalList = this.getListJournalComptable();
+            SequenceEcritureComptable sequenceEcritureComptable = new SequenceEcritureComptable();
+            for (JournalComptable journalC : journalList) {
+                if (journal.getCode().equals(journalC.getCode())) {
+                    journalExist = true;
+                }
+            }
+            if (journalExist) {
+                try {
+                    sequenceEcritureComptable = getDaoProxy().getComptabiliteDao().
+                            loadLastSequenceValueOfJournal(journal, currentYear);
+                    sequenceEcritureComptable.setDerniereValeur(
+                            sequenceEcritureComptable.getDerniereValeur() + 1);
+                } catch (NotFoundException e) {
+
+                    sequenceEcritureComptable.setAnnee(currentYear);
+                    sequenceEcritureComptable.setDerniereValeur(1);
+                    getDaoProxy().getComptabiliteDao()
+                            .insertSequenceEcritureComptable(sequenceEcritureComptable, journal);
+                }
+
+                String reference = String.format("%.2s-%4d/%05d", journal.getCode(),
+                        currentYear, sequenceEcritureComptable.getDerniereValeur()).trim();
+                pEcritureComptable.setReference(reference);
+                this.checkEcritureComptableContext(pEcritureComptable);
+                getDaoProxy().getComptabiliteDao()
+                        .updateSequenceEcritureComptable(sequenceEcritureComptable, journal);
+            } else {
+                System.out.println("le journal n'existe pas, il faut le créer");
+                pEcritureComptable.setReference("");
+            }
         }
     }
 
@@ -124,9 +135,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         Set<ConstraintViolation<EcritureComptable>> vViolations = getConstraintValidator().validate(pEcritureComptable);
         if (!vViolations.isEmpty()) {
             throw new FunctionalException("L'écriture comptable ne respecte pas les règles de gestion.",
-                    new ConstraintViolationException(
-                            "L'écriture comptable ne respecte pas les contraintes de validation",
-                            vViolations));
+                    new ConstraintViolationException(noConstraintValidation, vViolations));
         }
 
         // ===== RG_Compta_2 : Pour qu'une écriture comptable soit valide, elle doit être équilibrée
@@ -166,17 +175,14 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
 
             if (!journalOfRef.equals(pEcritureComptable.getJournal().getCode())) {
                 throw new FunctionalException("Le code de la référence ne correspond pas au code Journal.",
-                        new ConstraintViolationException(
-                                "L'écriture comptable ne respecte pas les contraintes de validation",
-                                vViolations));
+                        new ConstraintViolationException(noConstraintValidation, vViolations));
             }
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(pEcritureComptable.getDate());
-            if (dateOfRef != calendar.get(Calendar.YEAR)) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+            int currentYear = Integer.parseInt(sdf.format(pEcritureComptable.getDate()));
+            if (dateOfRef != currentYear) {
                 throw new FunctionalException("L'année de la référence ne correspond pas à l'année d'écriture.",
-                        new ConstraintViolationException(
-                                "L'écriture comptable ne respecte pas les contraintes de validation",
-                                vViolations));
+                        new ConstraintViolationException(noConstraintValidation, vViolations));
             }
         }
     }
