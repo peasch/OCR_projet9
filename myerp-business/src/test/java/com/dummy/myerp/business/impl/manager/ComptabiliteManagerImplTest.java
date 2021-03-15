@@ -1,19 +1,17 @@
 package com.dummy.myerp.business.impl.manager;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import com.dummy.myerp.model.bean.comptabilite.*;
+import com.dummy.myerp.technical.exception.FunctionalException;
 import com.dummy.myerp.technical.exception.NotFoundException;
 import com.dummy.myerp.testbusiness.business.SpringRegistry;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.dummy.myerp.technical.exception.FunctionalException;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class ComptabiliteManagerImplTest {
@@ -33,11 +31,11 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
-                                                                                 null, new BigDecimal(123),
-                                                                                 null));
+                null, new BigDecimal(123),
+                null));
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
-                                                                                 null, null,
-                                                                                 new BigDecimal(123)));
+                null, null,
+                new BigDecimal(123)));
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
 
@@ -56,11 +54,11 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
-                                                                                 null, new BigDecimal(123),
-                                                                                 null));
+                null, new BigDecimal(123),
+                null));
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
-                                                                                 null, null,
-                                                                                 new BigDecimal(1234)));
+                null, null,
+                new BigDecimal(1234)));
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
 
@@ -72,16 +70,16 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
-                                                                                 null, new BigDecimal(123),
-                                                                                 null));
+                null, new BigDecimal(123),
+                null));
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
-                                                                                 null, new BigDecimal(123),
-                                                                                 null));
+                null, new BigDecimal(123),
+                null));
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
 
     @Test(expected = FunctionalException.class)
-    public void checkEcritureComptableUnitRG5() throws Exception{
+    public void checkEcritureComptableUnitRG5() throws Exception {
         EcritureComptable vEcritureComptable;
         vEcritureComptable = new EcritureComptable();
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
@@ -92,10 +90,16 @@ public class ComptabiliteManagerImplTest {
                 null, new BigDecimal(123),
                 null));
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
-                null, null,new BigDecimal(123)
+                null, null, new BigDecimal(123)
         ));
         manager.checkEcritureComptableUnit(vEcritureComptable);
 
+    }
+
+    @Test
+    public void checkEcritureComptableUnitRG5_error() throws Exception {
+        EcritureComptable vEcritureComptable;
+        vEcritureComptable = new EcritureComptable();
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
@@ -104,61 +108,113 @@ public class ComptabiliteManagerImplTest {
                 null, new BigDecimal(123),
                 null));
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
-                null, null,new BigDecimal(123)
+                null, null, new BigDecimal(123)
         ));
         manager.checkEcritureComptableUnit(vEcritureComptable);
 
     }
 
-
     @Test
-    public void checkReference() throws Exception{
+    public void checkReference() throws Exception {
         System.out.println(manager.getListEcritureComptable());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
         String date = sdf.format(new Date());
         JournalComptable journal = new JournalComptable();
         journal.setCode("BQ");
         String code = "BQ";
-        int ref =23;
+        int ref = 23;
         System.out.println(date);
-        System.out.println(manager.getLastSequenceofJournal(journal,2016));
-        System.out.println(String.format("%05d",ref));
-        String reference =(code+"-"+date+"/"+String.format("%05d",ref)).trim();
+        System.out.println(manager.getLastSequenceofJournal(journal, 2016));
+        System.out.println(String.format("%05d", ref));
+        String reference = (code + "-" + date + "/" + String.format("%05d", ref)).trim();
         System.out.println(reference);
         System.out.println(manager.getListEcritureComptable().size());
-        System.out.println( String.format("%.2s-%4d/%05d", "BQ" ,22053, 23));
+        System.out.println(String.format("%.2s-%4d/%05d", "BQ", 22053, 23));
 
-        System.out.println( manager.getLastSequenceofJournal(journal,2021));
+        System.out.println(manager.getLastSequenceofJournal(journal, 2021));
     }
 
     @Test
     public void checkAddReference() throws NotFoundException, FunctionalException, ParseException {
         EcritureComptable ecritureComptable = new EcritureComptable();
         JournalComptable journal = new JournalComptable();
-        SequenceEcritureComptable sequence =new SequenceEcritureComptable();
+        SequenceEcritureComptable sequence = new SequenceEcritureComptable();
         journal.setCode("BQ");
         journal.setLibelle("Banque");
         ecritureComptable.setJournal(journal);
         manager.addReference(ecritureComptable);
-        Assert.assertEquals(ecritureComptable.getReference(),String.format("%.2s-%4d/%05d", "BQ" ,2021,1));
+        int lastValue = manager.getLastSequenceofJournal(journal, 2021).getDerniereValeur();
+        Assert.assertEquals(ecritureComptable.getReference(), String.format("%.2s-%4d/%05d", "BQ", 2021, lastValue));
+    }
 
-
+    @Test
+    public void testCheckAddReference_with_unexisting_journal() throws NotFoundException, FunctionalException {
+        EcritureComptable ecritureComptable = new EcritureComptable();
+        JournalComptable journal = new JournalComptable();
+        SequenceEcritureComptable sequence = new SequenceEcritureComptable();
         sequence.setDerniereValeur(2);
         sequence.setAnnee(2016);
         journal.setCode("AA");
         journal.setLibelle("Achats anticipés");
         ecritureComptable.setJournal(journal);
         manager.addReference(ecritureComptable);
-        Assert.assertEquals("",ecritureComptable.getReference());
+        Assert.assertEquals("", ecritureComptable.getReference());
+    }
 
+    @Test
+    public void testCheckAddReference_with_old_value() throws NotFoundException, FunctionalException, ParseException {
+
+        EcritureComptable ecritureComptable = new EcritureComptable();
+        JournalComptable journal = new JournalComptable();
+        SequenceEcritureComptable sequence = new SequenceEcritureComptable();
         journal.setCode("BQ");
         journal.setLibelle("Banque");
         ecritureComptable.setJournal(journal);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        String date1 ="01/01/2016";
+        String date1 = "01/01/2016";
         ecritureComptable.setDate(simpleDateFormat.parse(date1));
         manager.addReference(ecritureComptable);
-        Assert.assertEquals(ecritureComptable.getReference(),String.format("%.2s-%4d/%05d", "BQ" ,2016,52));
+        int lastValue = manager.getLastSequenceofJournal(journal, 2016).getDerniereValeur();
+        Assert.assertEquals(ecritureComptable.getReference(), String.format("%.2s-%4d/%05d", "BQ", 2016, lastValue));
+    }
 
+
+    @Test(expected = FunctionalException.class)
+    public void checkCheckEcritureComptable_when_error() throws FunctionalException, NotFoundException, ParseException {
+        EcritureComptable vEcritureComptable;
+        vEcritureComptable = new EcritureComptable();
+        vEcritureComptable.setJournal(new JournalComptable("BQ", "Banque"));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String date1 = "01/01/2016";
+        vEcritureComptable.setDate(simpleDateFormat.parse(date1));
+        vEcritureComptable.setLibelle("Libelle");
+        manager.addReference(vEcritureComptable);
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, new BigDecimal(123),
+                null));
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, null, new BigDecimal(1234)
+        ));
+
+        manager.checkEcritureComptable(vEcritureComptable);
+
+    }
+
+    @Test
+    public void checkCheckEcritureComptable() throws FunctionalException, NotFoundException, ParseException {
+        EcritureComptable vEcritureComptable;
+        vEcritureComptable = new EcritureComptable();
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        manager.addReference(vEcritureComptable);
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, new BigDecimal(123),
+                null));
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, null, new BigDecimal(123)
+        ));
+
+        manager.checkEcritureComptable(vEcritureComptable);
     }
 }

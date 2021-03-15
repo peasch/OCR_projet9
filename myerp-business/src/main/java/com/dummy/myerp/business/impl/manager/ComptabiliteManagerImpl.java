@@ -13,7 +13,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -114,7 +117,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     /**
      * {@inheritDoc}
      */
-    // TODO à tester
+    // à tester
     @Override
     public void checkEcritureComptable(EcritureComptable pEcritureComptable) throws FunctionalException {
         this.checkEcritureComptableUnit(pEcritureComptable);
@@ -174,15 +177,15 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
             int dateOfRef = Integer.parseInt(reference.substring(3, 7));
 
             if (!journalOfRef.equals(pEcritureComptable.getJournal().getCode())) {
-                throw new FunctionalException("Le code de la référence ne correspond pas au code Journal.",
-                        new ConstraintViolationException(noConstraintValidation, vViolations));
+                throw new FunctionalException("Le code de la référence ne correspond pas au code Journal."
+                        /*, new ConstraintViolationException(noConstraintValidation, vViolations)*/);
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
             int currentYear = Integer.parseInt(sdf.format(pEcritureComptable.getDate()));
             if (dateOfRef != currentYear) {
-                throw new FunctionalException("L'année de la référence ne correspond pas à l'année d'écriture.",
-                        new ConstraintViolationException(noConstraintValidation, vViolations));
+                throw new FunctionalException("L'année de la référence ne correspond pas à l'année d'écriture."
+                        /*, new ConstraintViolationException(noConstraintValidation, vViolations)*/);
             }
         }
     }
@@ -223,8 +226,9 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     public void insertEcritureComptable(EcritureComptable pEcritureComptable) throws FunctionalException {
         this.checkEcritureComptable(pEcritureComptable);
         TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
+
         try {
-            //check ecriture
+
             getDaoProxy().getComptabiliteDao().insertEcritureComptable(pEcritureComptable);
             getTransactionManager().commitMyERP(vTS);
             vTS = null;
@@ -238,9 +242,10 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
      */
     @Override
     public void updateEcritureComptable(EcritureComptable pEcritureComptable) throws FunctionalException {
+        this.checkEcritureComptable(pEcritureComptable);
         TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
         try {
-            // ajouter checkEcritureComptable
+
             getDaoProxy().getComptabiliteDao().updateEcritureComptable(pEcritureComptable);
             getTransactionManager().commitMyERP(vTS);
             vTS = null;
