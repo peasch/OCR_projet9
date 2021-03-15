@@ -69,12 +69,17 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     @Override
     public synchronized void addReference(EcritureComptable pEcritureComptable) throws NotFoundException, FunctionalException {
         Boolean journalExist = false;
-        int currentYear;
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         if (pEcritureComptable.getDate() != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
-            currentYear = Integer.parseInt(sdf.format(pEcritureComptable.getDate()));
+            int year = Integer.parseInt(sdf.format(pEcritureComptable.getDate()));
+            if (year > currentYear) {
+                throw new FunctionalException("L'année est erronée");
+            } else {
+                currentYear = year;
+            }
         } else {
-            currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
             pEcritureComptable.setDate(new Date());
         }
         JournalComptable journal = pEcritureComptable.getJournal();
@@ -132,7 +137,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
      * @param pEcritureComptable -
      * @throws FunctionalException Si l'Ecriture comptable ne respecte pas les règles de gestion
      */
-    // TODO tests à compléter
+    //  tests à compléter
     protected void checkEcritureComptableUnit(EcritureComptable pEcritureComptable) throws FunctionalException {
         // ===== Vérification des contraintes unitaires sur les attributs de l'écriture
         Set<ConstraintViolation<EcritureComptable>> vViolations = getConstraintValidator().validate(pEcritureComptable);
