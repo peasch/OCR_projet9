@@ -140,7 +140,7 @@ public class ComptabiliteManagerImplTest {
         journal.setLibelle("Banque");
         ecritureComptable.setJournal(journal);
         manager.addReference(ecritureComptable);
-        Assert.assertEquals(ecritureComptable.getReference(),String.format("%.2s-%4d/%05d", "BQ" ,2021,43));
+        Assert.assertEquals(ecritureComptable.getReference(),String.format("%.2s-%4d/%05d", "BQ" ,2021,1));
 
 
         sequence.setDerniereValeur(2);
