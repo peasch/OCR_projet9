@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Comptabilite manager implementation.
  */
-public class ComptabiliteManagerImpl extends AbstractBusinessManager implements ComptabiliteManager {
+public class /**/ComptabiliteManagerImpl extends AbstractBusinessManager implements ComptabiliteManager {
 
     // ==================== Attributs ====================
     private static String noConstraintValidation = "L'écriture comptable ne respecte pas les contraintes de validation";
@@ -56,18 +56,28 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     public List<EcritureComptable> getListEcritureComptable() {
         return getDaoProxy().getComptabiliteDao().getListEcritureComptable();
     }
+    @Override
+    public EcritureComptable getEcritureComptable(int pId) throws NotFoundException {
+        return getDaoProxy().getComptabiliteDao().getEcritureComptable(pId);
+
+    }
 
     public SequenceEcritureComptable getLastSequenceofJournal(JournalComptable journal, Integer year) throws NotFoundException {
         return getDaoProxy().getComptabiliteDao().loadLastSequenceValueOfJournal(journal, year);
     }
 
+    @Override
+    public EcritureComptable getEcritureComptableByRef(String reference) throws NotFoundException {
+        return getDaoProxy().getComptabiliteDao().getEcritureComptableByRef(reference);
+
+    }
 
     /**
      * {@inheritDoc}
      */
     //  à tester
     @Override
-    public synchronized void addReference(EcritureComptable pEcritureComptable) throws NotFoundException, FunctionalException {
+    public synchronized void addReference(EcritureComptable pEcritureComptable) throws FunctionalException {
         Boolean journalExist = false;
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         if (pEcritureComptable.getDate() != null) {
@@ -166,9 +176,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         }
         // On test le nombre de lignes car si l'écriture à une seule ligne
         //      avec un montant au débit et un montant au crédit ce n'est pas valable
-        if (pEcritureComptable.getListLigneEcriture().size() < 2
-                || vNbrCredit < 1
-                || vNbrDebit < 1) {
+        if (pEcritureComptable.getListLigneEcriture().size() < 2 || vNbrCredit < 1 || vNbrDebit < 1) {
             throw new FunctionalException(
                     "L'écriture comptable doit avoir au moins deux lignes : une ligne au débit et une ligne au crédit.");
         }

@@ -53,6 +53,8 @@ public interface ComptabiliteManager {
      */
     void addReference(EcritureComptable pEcritureComptable) throws NotFoundException, FunctionalException;
 
+    EcritureComptable getEcritureComptable(int pId) throws NotFoundException;
+    EcritureComptable getEcritureComptableByRef(String reference) throws NotFoundException;
     /**
      * Vérifie que l'Ecriture comptable respecte les règles de gestion.
      *

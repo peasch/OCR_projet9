@@ -1,9 +1,12 @@
 package com.dummy.myerp.business.impl.manager;
 
+import com.dummy.myerp.consumer.dao.contrat.ComptabiliteDao;
+import com.dummy.myerp.consumer.dao.contrat.DaoProxy;
 import com.dummy.myerp.model.bean.comptabilite.*;
 import com.dummy.myerp.technical.exception.FunctionalException;
 import com.dummy.myerp.technical.exception.NotFoundException;
 import com.dummy.myerp.testbusiness.business.SpringRegistry;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,6 +15,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 public class ComptabiliteManagerImplTest {
@@ -77,6 +81,21 @@ public class ComptabiliteManagerImplTest {
                 null));
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
+    @Test(expected = FunctionalException.class)
+    public void checkEcritureComptableUnitRG3_equilibre() throws Exception {
+        EcritureComptable vEcritureComptable;
+        vEcritureComptable = new EcritureComptable();
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, new BigDecimal(123),
+                null));
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, new BigDecimal(123),
+                null));
+        manager.checkEcritureComptableUnit(vEcritureComptable);
+    }
 
     @Test(expected = FunctionalException.class)
     public void checkEcritureComptableUnitRG5() throws Exception {
@@ -128,17 +147,32 @@ public class ComptabiliteManagerImplTest {
     }
 
     @Test
-    public void testCheckAddReference_with_unexisting_journal() throws NotFoundException, FunctionalException {
+    public void testCheckAddReference_with_unexisting_journal() throws FunctionalException, NotFoundException {
         EcritureComptable ecritureComptable = new EcritureComptable();
         JournalComptable journal = new JournalComptable();
         SequenceEcritureComptable sequence = new SequenceEcritureComptable();
         sequence.setDerniereValeur(2);
         sequence.setAnnee(2016);
         journal.setCode("AA");
-        journal.setLibelle("Achats anticipés");
+        journal.setLibelle("Achats");
         ecritureComptable.setJournal(journal);
         manager.addReference(ecritureComptable);
+        Assert.assertEquals(ecritureComptable.getReference(), "");
 
+    }
+    @Test
+    public void testCheckAddReference_with_existing_journal() throws FunctionalException, NotFoundException {
+        EcritureComptable ecritureComptable = new EcritureComptable();
+        JournalComptable journal = new JournalComptable();
+        SequenceEcritureComptable sequence = new SequenceEcritureComptable();
+        sequence.setDerniereValeur(2);
+        sequence.setAnnee(2021);
+        journal.setCode("AC");
+        journal.setLibelle("Achats ");
+        ecritureComptable.setJournal(journal);
+        manager.addReference(ecritureComptable);
+        int lastValue = manager.getLastSequenceofJournal(journal, 2021).getDerniereValeur();
+        Assert.assertEquals(ecritureComptable.getReference(), String.format("%.2s-%4d/%05d", "AC", 2021, lastValue));
     }
 
     @Test
@@ -210,6 +244,20 @@ public class ComptabiliteManagerImplTest {
         ));
         manager.checkEcritureComptable(vEcritureComptable);
 
+    }
+    @Test(expected = FunctionalException.class)
+    public void checkCheckEcritureComptable_with_one_line() throws FunctionalException, NotFoundException {
+        EcritureComptable vEcritureComptable;
+        vEcritureComptable = new EcritureComptable();
+
+        vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
+        vEcritureComptable.setDate(new Date());
+        vEcritureComptable.setLibelle("Libelle");
+        manager.addReference(vEcritureComptable);
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, new BigDecimal(123),
+                null));
+        manager.checkEcritureComptable(vEcritureComptable);
 
     }
     @Test
@@ -229,12 +277,14 @@ public class ComptabiliteManagerImplTest {
         ));
 
         manager.insertEcritureComptable(vEcritureComptable);
+        manager.deleteEcritureComptable(vEcritureComptable.getId());
 
 
     }
-   /* @Test
+    @Test
     public void checkCheckEcritureComptable_update() throws FunctionalException, NotFoundException {
         EcritureComptable vEcritureComptable;
+        EcritureComptable vEcritureComptableUpdate;
         vEcritureComptable = new EcritureComptable();
 
         vEcritureComptable.setJournal(new JournalComptable("AC", "Achat"));
@@ -247,9 +297,40 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(4457),
                 null, null, new BigDecimal(123)
         ));
-        insert vEcriture
-        modifier et update
-        manager.updateEcritureComptable(vEcritureComptable);
+        manager.insertEcritureComptable(vEcritureComptable);
+        vEcritureComptableUpdate=manager.getEcritureComptableByRef(vEcritureComptable.getReference());
+        vEcritureComptableUpdate.setLibelle("updated libelle");
+        manager.updateEcritureComptable(vEcritureComptableUpdate);
 
-    }*/
+    }
+
+   @Test
+    public void test_toString (){
+       CompteComptable compteComptable =new CompteComptable();
+       EcritureComptable ecritureComptable = new EcritureComptable();
+       JournalComptable journalComptable = new JournalComptable();
+       LigneEcritureComptable ligneEcritureComptable = new LigneEcritureComptable();
+       SequenceEcritureComptable sequenceEcritureComptable = new SequenceEcritureComptable();
+
+       System.out.println(compteComptable.toString()
+               + ecritureComptable.toString()
+               + journalComptable.toString()
+               + ligneEcritureComptable.toString()
+               + sequenceEcritureComptable.toString());
+   }
+
+   @Test(expected = NotFoundException.class)
+    public void test_get_by() throws NotFoundException {
+       CompteComptable compteComptable =new CompteComptable();
+       EcritureComptable ecritureComptable = new EcritureComptable();
+       JournalComptable journalComptable = new JournalComptable();
+       LigneEcritureComptable ligneEcritureComptable = new LigneEcritureComptable();
+       SequenceEcritureComptable sequenceEcritureComptable = new SequenceEcritureComptable();
+       List<JournalComptable> journalList =manager.getListJournalComptable();
+       journalComptable = JournalComptable.getByCode(journalList,"AC");
+       List<CompteComptable> compteComptableList =manager.getListCompteComptable();
+       compteComptable =CompteComptable.getByNumero(compteComptableList,401);
+       List<EcritureComptable> ecritureComptableList =manager.getListEcritureComptable();
+       ecritureComptable = manager.getEcritureComptable(1);
+   }
 }
