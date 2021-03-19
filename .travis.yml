@@ -23,3 +23,6 @@ after_script:
   - docker-compose -f docker/dev/docker-compose.yml rm -f
   # Stops containers and removes containers, networks, volumes, and images created by up
   - docker-compose -f docker/dev/docker-compose.yml down
+
+after_success:
+  - mvn --file pom.xml cobertura:cobertura coveralls:report -P test-consumer,test-business
