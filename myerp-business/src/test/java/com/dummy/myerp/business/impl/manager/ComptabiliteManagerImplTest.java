@@ -301,6 +301,7 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptableUpdate=manager.getEcritureComptableByRef(vEcritureComptable.getReference());
         vEcritureComptableUpdate.setLibelle("updated libelle");
         manager.updateEcritureComptable(vEcritureComptableUpdate);
+        manager.deleteEcritureComptable(vEcritureComptableUpdate.getId());
 
     }
 

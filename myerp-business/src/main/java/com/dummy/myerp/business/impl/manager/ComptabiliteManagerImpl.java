@@ -56,6 +56,7 @@ public class /**/ComptabiliteManagerImpl extends AbstractBusinessManager impleme
     public List<EcritureComptable> getListEcritureComptable() {
         return getDaoProxy().getComptabiliteDao().getListEcritureComptable();
     }
+
     @Override
     public EcritureComptable getEcritureComptable(int pId) throws NotFoundException {
         return getDaoProxy().getComptabiliteDao().getEcritureComptable(pId);
@@ -103,11 +104,10 @@ public class /**/ComptabiliteManagerImpl extends AbstractBusinessManager impleme
                 }
             }
             if (journalExist) {
+
                 try {
-                    sequenceEcritureComptable = getDaoProxy().getComptabiliteDao().
-                            loadLastSequenceValueOfJournal(journal, currentYear);
-                    sequenceEcritureComptable.setDerniereValeur(
-                            sequenceEcritureComptable.getDerniereValeur() + 1);
+                    sequenceEcritureComptable = getDaoProxy().getComptabiliteDao().loadLastSequenceValueOfJournal(journal, currentYear);
+                    sequenceEcritureComptable.setDerniereValeur(sequenceEcritureComptable.getDerniereValeur() + 1);
                 } catch (NotFoundException e) {
 
                     sequenceEcritureComptable.setAnnee(currentYear);
