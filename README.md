@@ -1,3 +1,2 @@
 ## Build
-
-[![Coverage Status](https://coveralls.io/repos/github/peasch/OCR_projet9/badge.svg?branch=testBranch)](https://coveralls.io/github/peasch/OCR_projet9?branch=testBranch)
+[![Build Status](https://travis-ci.com/peasch/OCR_projet9.svg?branch=master)](https://travis-ci.com/peasch/OCR_projet9)
