@@ -202,7 +202,7 @@ public class /**/ComptabiliteManagerImpl extends AbstractBusinessManager impleme
             }
         }
     }
-
+//
 
     /**
      * Vérifie que l'Ecriture comptable respecte les règles de gestion liées au contexte

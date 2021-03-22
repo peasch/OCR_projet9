@@ -14,7 +14,7 @@ before_script:
   - docker-compose -f docker/dev/docker-compose.yml up -d
 
 script:
-  -  mvn install -Ptest-business -Ptest-consumer
+  -  mvn install -P test-business -P test-consumer
 
 after_script:
   # Stops running containers without removing themm
